@@ -1,11 +1,6 @@
 set -x
 ENGINE=${1:-vllm}
-ulimit -u 65536
 export VLLM_ATTENTION_BACKEND=XFORMERS
-export OMP_NUM_THREADS=1
-export MKL_NUM_THREADS=1
-export OPENBLAS_NUM_THREADS=1
-export NUMEXPR_NUM_THREADS=1
 
 num_cpus_per_env_worker=0.1 # The CPU resource allocated for each environment worker. If you want to use less CPU resources, you can decrease this value.
 
@@ -29,7 +24,6 @@ python3 -m verl.trainer.main_ppo \
     data.max_prompt_length=2048 \
     data.max_response_length=512 \
     data.filter_overlong_prompts=True \
-    data.filter_overlong_prompts_workers=1 \
     data.truncation='error' \
     data.return_raw_chat=True \
     actor_rollout_ref.model.path=Qwen/Qwen2.5-1.5B-Instruct \
