@@ -13,8 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import List
+from typing import List, Set
 import re
+
+
+def _normalize_action(action: str) -> str:
+    return action.strip().lower()
+
+
+def _normalize_action_pool(action_pool: List[str]) -> Set[str]:
+    if action_pool is None:
+        return set()
+    return {_normalize_action(str(action)) for action in action_pool}
+
 
 def alfworld_projection(actions: List[str], action_pools: List[List[str]]):
     """
@@ -44,7 +55,8 @@ def alfworld_projection(actions: List[str], action_pools: List[List[str]]):
             extracted_action = actions[i][start_idx + len(start_tag):end_idx].strip().lower()
             
             actions[i] = extracted_action
-            valids[i] = 1
+            valid_actions = _normalize_action_pool(action_pools[i] if i < len(action_pools) else None)
+            valids[i] = int(extracted_action in valid_actions)
 
         except:
             actions[i] = actions[i][-30:]
