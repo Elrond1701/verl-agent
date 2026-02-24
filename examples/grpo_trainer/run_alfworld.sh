@@ -2,11 +2,11 @@ set -x
 ENGINE=${1:-vllm}
 export VLLM_ATTENTION_BACKEND=FLASH_ATTN
 
-num_cpus_per_env_worker=0.1 # The CPU resource allocated for each environment worker. If you want to use less CPU resources, you can decrease this value.
+num_cpus_per_env_worker=0.05 # The CPU resource allocated for each environment worker. If you want to use less CPU resources, you can decrease this value.
 
-train_data_size=8
+train_data_size=16
 val_data_size=128
-group_size=4
+group_size=8
 
 export WANDB_ENTITY="${WANDB_ENTITY:-Learn2Explore}"
 
