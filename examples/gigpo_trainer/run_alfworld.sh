@@ -2,12 +2,13 @@ set -x
 ENGINE=${1:-vllm}
 export VLLM_ATTENTION_BACKEND=XFORMERS
 
-num_cpus_per_env_worker=0.01 # The CPU resource allocated for each environment worker. If you want to use less CPU resources, you can decrease this value.
+num_cpus_per_env_worker=0.1 # The CPU resource allocated for each environment worker. If you want to use less CPU resources, you can decrease this value.
 
-train_data_size=16
+train_data_size=8
 val_data_size=128
 group_size=8
 mode="mean_std_norm" # "mean_norm" or "mean_std_norm"
+export WANDB_ENTITY="${WANDB_ENTITY:-Learn2Explore}"
 
 # We only use data preparation to indicate the modality and the data size.
 python3 -m examples.data_preprocess.prepare \
