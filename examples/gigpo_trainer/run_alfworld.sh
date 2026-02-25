@@ -69,4 +69,5 @@ python3 -m verl.trainer.main_ppo \
     trainer.save_freq=-1 \
     trainer.test_freq=5 \
     trainer.total_epochs=150 \
+    ray_init.num_cpus=52 \
     trainer.val_before_train=True $@
