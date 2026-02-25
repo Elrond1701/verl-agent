@@ -68,6 +68,37 @@ def summarize_group_size(group_size: list):
     for size, (cnt, prop) in summary.items():
         if prop:
             print(f"{size:>4} | {cnt:>5} | {prop:>9.2%}")
+
+def compute_group_size_stats(group_size: Sequence[int]) -> Dict[str, float]:
+    """
+    Compute scalar summary stats for step-level group sizes.
+
+    Args:
+        group_size: Sequence of group sizes.
+
+    Returns:
+        Dict[str, float]: min/max/mean/median/singleton_ratio/step_group_count statistics.
+    """
+    if len(group_size) == 0:
+        return {
+            "min": 0.0,
+            "max": 0.0,
+            "mean": 0.0,
+            "median": 0.0,
+            "singleton_ratio": 0.0,
+            "step_group_count": 0.0,
+        }
+
+    group_size_np = np.asarray(group_size, dtype=np.float32)
+    singleton_ratio = float(np.mean(group_size_np == 1.0))
+    return {
+        "min": float(np.min(group_size_np)),
+        "max": float(np.max(group_size_np)),
+        "mean": float(np.mean(group_size_np)),
+        "median": float(np.median(group_size_np)),
+        "singleton_ratio": singleton_ratio,
+        "step_group_count": float(group_size_np.shape[0]),
+    }
             
 def are_similar(a: str, b: str, threshold: float = 0.95) -> bool:
     """
@@ -146,6 +177,7 @@ def compute_gigpo_outcome_advantage(token_level_rewards: torch.Tensor,
                                    mode: str = "mean_norm",
                                    enable_similarity: bool = False,
                                    similarity_thresh: float = 0.95,
+                                   return_step_group_stats: bool = False,
                                    ):
     """
     Compute the advantages for GiGPO (https://arxiv.org/abs/2505.10978).
@@ -162,12 +194,16 @@ def compute_gigpo_outcome_advantage(token_level_rewards: torch.Tensor,
     
     # Anchor state grouping (Eq. 6 in the paper).
     step_group_uids = build_step_group(anchor_obs, index, enable_similarity, similarity_thresh)
+    step_group_sizes = Counter(step_group_uids).values()
+    step_group_stats = compute_group_size_stats(list(step_group_sizes))
 
     # Compute step relative advantages (Eq. 7 in the paper).
     step_advantages = step_norm_reward(step_rewards, response_mask, step_group_uids, epsilon, remove_std)
 
     # Compute joint advantages (Eq. 8 in the paper).
     scores = episode_advantages + step_advantage_w * step_advantages
+    if return_step_group_stats:
+        return scores, scores, step_group_stats
     return scores, scores
 
 
@@ -327,7 +363,16 @@ def build_step_group(anchor_obs: np.array, index: np.array, enable_similarity: b
 
     if summarize:
         summarize_group_size(group_size)
-    print(f"Avg size of step-level group: {np.mean(group_size)}")
+    group_size_stats = compute_group_size_stats(group_size)
+    print(
+        "Step-level group size stats: "
+        f"min={group_size_stats['min']:.2f}, "
+        f"max={group_size_stats['max']:.2f}, "
+        f"mean={group_size_stats['mean']:.2f}, "
+        f"median={group_size_stats['median']:.2f}, "
+        f"singleton_ratio={group_size_stats['singleton_ratio']:.2%}, "
+        f"step_group_count={int(group_size_stats['step_group_count'])}"
+    )
     return step_group_uids
 
 
@@ -382,4 +427,3 @@ def step_norm_reward(step_rewards: torch.Tensor,
         step_advantages = scores.unsqueeze(-1).tile([1, response_length]) * response_mask
     
     return step_advantages
-

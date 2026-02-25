@@ -343,7 +343,7 @@ def compute_advantage(data: DataProto, adv_estimator, gamma=1.0, lam=1.0, num_re
         data.batch["advantages"] = advantages
         data.batch["returns"] = returns
     elif adv_estimator == AdvantageEstimator.GiGPO:
-        advantages, returns = core_gigpo.compute_gigpo_outcome_advantage(
+        advantages, returns, step_group_size_stats = core_gigpo.compute_gigpo_outcome_advantage(
             token_level_rewards=data.batch['token_level_rewards'], # for episode group reward computing
             step_rewards=data.batch['step_rewards'], # for step group reward computing
             response_mask=data.batch['response_mask'],
@@ -354,9 +354,11 @@ def compute_advantage(data: DataProto, adv_estimator, gamma=1.0, lam=1.0, num_re
             mode=gigpo_mode,
             enable_similarity=gigpo_enable_similarity,
             similarity_thresh=gigpo_similarity_thresh,
+            return_step_group_stats=True,
             )
         data.batch['advantages'] = advantages
         data.batch['returns'] = returns
+        data.meta_info["gigpo_step_group_size_stats"] = step_group_size_stats
     else:
         raise NotImplementedError
     return data
@@ -1234,6 +1236,19 @@ class RayPPOTrainer:
                             gigpo_enable_similarity= self.config.algorithm.gigpo.enable_similarity,
                             gigpo_similarity_thresh=self.config.algorithm.gigpo.similarity_thresh,
                         )
+                        if self.config.algorithm.adv_estimator == AdvantageEstimator.GiGPO:
+                            step_group_size_stats = batch.meta_info.get("gigpo_step_group_size_stats")
+                            if step_group_size_stats is not None:
+                                metrics.update(
+                                    {
+                                        "gigpo/step_group_size/min": step_group_size_stats["min"],
+                                        "gigpo/step_group_size/max": step_group_size_stats["max"],
+                                        "gigpo/step_group_size/mean": step_group_size_stats["mean"],
+                                        "gigpo/step_group_size/median": step_group_size_stats["median"],
+                                        "gigpo/step_group_size/singleton_ratio": step_group_size_stats["singleton_ratio"],
+                                        "gigpo/step_group_count": step_group_size_stats["step_group_count"],
+                                    }
+                                )
 
                     # update critic
                     if self.use_critic:
