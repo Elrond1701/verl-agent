@@ -1,5 +1,4 @@
 set -x
-ulimit -u 65536 | true
 ENGINE=${1:-vllm}
 export VLLM_ATTENTION_BACKEND=FLASH_ATTN
 
