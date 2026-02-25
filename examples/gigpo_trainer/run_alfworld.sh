@@ -6,7 +6,7 @@ export VLLM_ATTENTION_BACKEND=FLASH_ATTN
 num_cpus_per_env_worker=0.1 # The CPU resource allocated for each environment worker. If you want to use less CPU resources, you can decrease this value.
 
 train_data_size=16
-val_data_size=96
+val_data_size=86
 group_size=8
 mode="mean_std_norm" # "mean_norm" or "mean_std_norm"
 export WANDB_ENTITY="${WANDB_ENTITY:-Learn2Explore}"
