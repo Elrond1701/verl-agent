@@ -62,7 +62,7 @@ python3 -m verl.trainer.main_ppo \
     algorithm.gigpo.mode=$mode \
     env.env_name=alfworld/AlfredTWEnv \
     env.seed=0 \
-    env.max_steps=10 \
+    env.max_steps=30 \
     env.rollout.n=$group_size \
     env.resources_per_worker.num_cpus=$num_cpus_per_env_worker \
     trainer.critic_warmup=0 \
