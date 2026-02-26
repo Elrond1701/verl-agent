@@ -1,11 +1,12 @@
 set -x
+ulimit -u 65536 | true
 ENGINE=${1:-vllm}
 export VLLM_ATTENTION_BACKEND=FLASH_ATTN
 
 num_cpus_per_env_worker=0.1 # The CPU resource allocated for each environment worker. If you want to use less CPU resources, you can decrease this value.
 
 train_data_size=16
-val_data_size=128
+val_data_size=92
 group_size=8
 mode="mean_std_norm" # "mean_norm" or "mean_std_norm"
 export WANDB_ENTITY="${WANDB_ENTITY:-Learn2Explore}"
@@ -22,15 +23,15 @@ python3 -m verl.trainer.main_ppo \
     data.val_files=$HOME/data/verl-agent/text/test.parquet \
     data.train_batch_size=$train_data_size \
     data.val_batch_size=$val_data_size \
-    data.max_prompt_length=2048 \
-    data.max_response_length=512 \
+    data.max_prompt_length=4096 \
+    data.max_response_length=1024 \
     data.filter_overlong_prompts=True \
     data.truncation='error' \
     data.return_raw_chat=True \
-    actor_rollout_ref.model.path=Qwen/Qwen3-1.7B \
+    actor_rollout_ref.model.path=Qwen/Qwen2.5-1.5B-Instruct \
     actor_rollout_ref.model.lora_rank=8 \
     actor_rollout_ref.model.lora_alpha=16 \
-    actor_rollout_ref.actor.optim.lr=3e-5 \
+    actor_rollout_ref.actor.optim.lr=1e-4 \
     actor_rollout_ref.model.use_remove_padding=True \
     actor_rollout_ref.actor.ppo_mini_batch_size=256 \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=32 \
@@ -39,9 +40,11 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.actor.fsdp_config.param_offload=False \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=False \
+    +actor_rollout_ref.actor.fsdp_config.model_dtype=bfloat16 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=32 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=2 \
     actor_rollout_ref.rollout.name=$ENGINE \
+    actor_rollout_ref.rollout.dtype=bfloat16 \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
     actor_rollout_ref.rollout.enforce_eager=False \
@@ -50,6 +53,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.val_kwargs.do_sample=True \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=32 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
+    +actor_rollout_ref.ref.fsdp_config.model_dtype=bfloat16 \
     actor_rollout_ref.actor.use_invalid_action_penalty=True \
     actor_rollout_ref.actor.invalid_action_penalty_coef=0.1 \
     algorithm.use_kl_in_reward=False \
@@ -64,7 +68,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.critic_warmup=0 \
     trainer.logger=['console','wandb'] \
     trainer.project_name='verl_agent_alfworld' \
-    trainer.experiment_name='gigpo_qwen3_1.7b_no_kl_lora' \
+    trainer.experiment_name='gigpo_qwen2.5_1.5b_no_kl_lora_purely_same' \
     trainer.n_gpus_per_node=2 \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \

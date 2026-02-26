@@ -183,7 +183,7 @@ class AlfWorldEnvironmentManager(EnvironmentManagerBase):
         """
         postprocess_text_obs = []
         if not init and self.config.env.history_length > 0:
-            memory_contexts, valid_lens = self.memory.fetch(
+            action_contexts, observation_contexts, valid_lens = self.memory._fetch(
                     self.config.env.history_length,
                     obs_key="text_obs",
                     action_key="action")
@@ -202,7 +202,8 @@ class AlfWorldEnvironmentManager(EnvironmentManagerBase):
                     task_description=self.tasks[i],
                     step_count=len(self.memory[i]),
                     history_length=valid_lens[i],
-                    action_history=memory_contexts[i],
+                    action_history=action_contexts[i],
+                    observation_history=observation_contexts[i], 
                     current_step=len(self.memory[i]) + 1,
                     current_observation=text_obs[i],
                     admissible_actions=reformatted_admissible_actions
