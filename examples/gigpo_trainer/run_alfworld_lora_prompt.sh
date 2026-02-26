@@ -5,7 +5,7 @@ export VLLM_ATTENTION_BACKEND=FLASH_ATTN
 
 num_cpus_per_env_worker=0.1 # The CPU resource allocated for each environment worker. If you want to use less CPU resources, you can decrease this value.
 
-train_data_size=12
+train_data_size=16
 val_data_size=92
 group_size=8
 mode="mean_std_norm" # "mean_norm" or "mean_std_norm"
@@ -23,7 +23,7 @@ python3 -m verl.trainer.main_ppo \
     data.val_files=$HOME/data/verl-agent/text/test.parquet \
     data.train_batch_size=$train_data_size \
     data.val_batch_size=$val_data_size \
-    data.max_prompt_length=4096 \
+    data.max_prompt_length=2048 \
     data.max_response_length=512 \
     data.filter_overlong_prompts=True \
     data.truncation='error' \
