@@ -129,6 +129,7 @@ class SimpleMemory(BaseMemory):
 
         for env_idx in range(self.batch_size):
             recent = self._data[env_idx][-history_length:]
+            full = self._data[env_idx]
             valid_len = len(recent)
             start_idx = len(self._data[env_idx]) - valid_len
 
@@ -136,11 +137,14 @@ class SimpleMemory(BaseMemory):
             obs_lines = []
             for j, rec in enumerate(recent):
                 step_num = start_idx + j + 1
-                act = rec[action_key]
                 obs = rec[obs_key]
                 obs_lines.append(
                     f"Observation at step {step_num}: '{obs}'"
                 )
+            
+            for j, ful in enumerate(full):
+                step_num = j + 1
+                act = ful[action_key]
                 act_lines.append(
                     f"Action at step {step_num}: '{act}'"
                 )
