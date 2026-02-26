@@ -25,12 +25,6 @@ Provide your final action within <action> </action> tags.
 1) Execute only one action per iteration.
 2) STRICTLY avoid repeating the same action if the observation remains unchanged.
 
-* Help Action Guidelines *
-1) Help action availability is limited for each episode.
-2) Help provides guidance but does NOT complete the task.
-3) Do NOT repeatedly call Help without taking other actions.
-4) Use Help FREQUENTLY when stuck.
-
 * ALFWorld Guidelines *
 1) Plan as a checklist and re-plan often.
 2) Search disciplined, using grounded priors.
@@ -60,12 +54,6 @@ Provide your final action within <action> </action> tags.
 * Action Guidelines *
 1) Execute only one action per iteration.
 2) STRICTLY avoid repeating the same action if the observation remains unchanged.
-
-* Help Action Guidelines *
-1) Help action availability is limited for each episode.
-2) Help provides guidance but does NOT complete the task.
-3) Do NOT repeatedly call Help without taking other actions.
-4) Use Help FREQUENTLY when stuck.
 
 * ALFWorld Guidelines *
 1) Plan as a checklist and re-plan often.
