@@ -68,7 +68,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.critic_warmup=0 \
     trainer.logger=['console','wandb'] \
     trainer.project_name='verl_agent_alfworld' \
-    trainer.experiment_name='gigpo_qwen2.5_1.5b_no_kl_lora_purely_same' \
+    trainer.experiment_name='gigpo_qwen2.5_1.5b_no_kl_lora_rank8_alpha16_lr_1e_4_our_prompt' \
     trainer.n_gpus_per_node=2 \
     trainer.nnodes=1 \
     trainer.save_freq=-1 \
