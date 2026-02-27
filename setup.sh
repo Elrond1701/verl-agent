@@ -7,6 +7,7 @@ source .venv/bin/activate
 uv pip install vllm==0.11.0
 
 uv pip install flash-attn --no-build-isolation
+uv pip install -U "wandb>=0.16"
 uv pip install -e .
 
 uv pip install gymnasium==0.29.1
