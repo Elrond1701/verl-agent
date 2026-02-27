@@ -1,7 +1,7 @@
 export UV_CACHE_DIR="../.tmp/uv" # change the directory to your own uv cache directory
 export HF_MODEL_DIR="./models"
 
-uv venv --python 3.12
+uv venv --python 3.11
 source .venv/bin/activate
 
 uv pip install vllm==0.11.0
