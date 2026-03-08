@@ -30,7 +30,7 @@ python3 -m verl.trainer.main_ppo \
     data.return_raw_chat=True \
     actor_rollout_ref.model.path=Qwen/Qwen2.5-1.5B-Instruct \
     actor_rollout_ref.model.lora_rank=256 \
-    actor_rollout_ref.model.lora_alpha=256 \
+    actor_rollout_ref.model.lora_alpha=512 \
     actor_rollout_ref.model.target_modules=all-linear \
     actor_rollout_ref.actor.optim.lr=2e-5 \
     actor_rollout_ref.model.use_remove_padding=True \
